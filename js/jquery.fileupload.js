@@ -435,7 +435,7 @@
         _initXHRData: function (options) {
             var that = this,
                 formData,
-                file = options.files[0],
+                file = options.files[0] || options.item(0),
                 // Ignore non-multipart setting if not supported:
                 multipart = options.multipart || !$.support.xhrFileUpload,
                 paramName = $.type(options.paramName) === 'array' ?
@@ -714,7 +714,7 @@
         _chunkedUpload: function (options, testOnly) {
             options.uploadedBytes = options.uploadedBytes || 0;
             var that = this,
-                file = options.files[0],
+                file = options.files[0] || options.item(0),
                 fs = file.size,
                 ub = options.uploadedBytes,
                 mcs = options.maxChunkSize || fs,
@@ -967,6 +967,7 @@
                 options = $.extend({}, this.options, data),
                 files = data.files,
                 filesLength = files.length,
+                filesSize = files[0].size || files.item(0).size,
                 limit = options.limitMultiFileUploads,
                 limitSize = options.limitMultiFileUploadSize,
                 overhead = options.limitMultiFileUploadSizeOverhead,
@@ -977,7 +978,7 @@
                 fileSet,
                 i,
                 j = 0;
-            if (limitSize && (!filesLength || files[0].size === undefined)) {
+            if (limitSize && (!filesLength || filesSize === undefined)) {
                 limitSize = undefined;
             }
             if (!(options.singleFileUploads || limit || limitSize) ||
@@ -1166,6 +1167,8 @@
                 return this._handleFileTreeEntries(entries);
             }
             files = $.makeArray(fileInput.prop('files'));
+            var filesName = files[0].name || files.item(0).name,
+                filesFileName = files[0].fileName || files.item(0).fileName;
             if (!files.length) {
                 value = fileInput.prop('value');
                 if (!value) {
@@ -1175,7 +1178,7 @@
                 // support the File API and we add a pseudo File object with
                 // the input value as name with path information removed:
                 files = [{name: value.replace(/^.*\\/, '')}];
-            } else if (files[0].name === undefined && files[0].fileName) {
+            } else if (filesName === undefined && filesFileName) {
                 // File normalization for Safari 4 and Firefox 3:
                 $.each(files, function (index, file) {
                     file.name = file.fileName;
